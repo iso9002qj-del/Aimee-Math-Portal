@@ -69,7 +69,7 @@ def chat():
             return jsonify({"reply": "错误：云端 API Key 未配置。请设置 GEMINI_API_KEY。"}), 500
 
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         prompt = f"""
         你是数学助教小安，辅导12岁女孩艾米。
