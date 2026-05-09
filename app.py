@@ -89,26 +89,19 @@ def chat():
         """
 
         try:
-            # 尝试使用最通用的名称，不带 models/ 前缀
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # 对接 2026 年最新的 2.5 Flash 模型
+            model = genai.GenerativeModel('models/gemini-2.5-flash')
             response = model.generate_content(prompt)
             return jsonify({"reply": response.text})
         except Exception as e:
-            print(f"Gemini API Error (Flash): {str(e)}")
+            print(f"Gemini API Error (2.5 Flash): {str(e)}")
             try:
-                # 尝试带前缀
-                model = genai.GenerativeModel('models/gemini-1.5-flash')
+                # Fallback 到 2.0 Flash
+                model = genai.GenerativeModel('models/gemini-2.0-flash')
                 response = model.generate_content(prompt)
                 return jsonify({"reply": response.text})
             except Exception as e2:
-                print(f"Gemini API Error (Flash-models/): {str(e2)}")
-                try:
-                    # 尝试 Pro
-                    model = genai.GenerativeModel('gemini-1.5-pro')
-                    response = model.generate_content(prompt)
-                    return jsonify({"reply": response.text})
-                except Exception as e3:
-                    return jsonify({"reply": f"后端异常汇总: {str(e3)}. 环境支持模型: {str(available_models if 'available_models' in locals() else 'Unknown')}"}), 500
+                return jsonify({"reply": f"后端异常汇总: {str(e2)}"}), 500
     except Exception as e:
         return jsonify({"reply": f"后端发生异常: {str(e)}"}), 500
 
