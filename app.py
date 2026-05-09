@@ -70,33 +70,36 @@ def chat():
 
         genai.configure(api_key=api_key)
         
+        # 调试：列出可用模型
+        try:
+            available_models = [m.name for m in genai.list_models()]
+            print(f"Render Environment Available Models: {available_models}")
+        except Exception as list_err:
+            print(f"Failed to list models: {str(list_err)}")
+
         prompt = f"""
         你是数学助教小安，辅导12岁女孩艾米。
-        当前周：第{week_num}周
-        课题：{week_data['topic']}
-        方法论指导：{week_data.get('methodology', '启发式思维')}
-        
-        规则：
-        1. 亲切耐心。
-        2. 启发式教学，绝不直接给答案。
-        3. 鼓励试错。
+        请根据课程内容【{current_task}】进行互动。
+        保持亲切、严谨、多提问引导。
         
         艾米说：{user_message}
         """
+
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # 使用显式命名空间
+            model = genai.GenerativeModel('models/gemini-1.5-flash')
             response = model.generate_content(prompt)
             return jsonify({"reply": response.text})
         except Exception as e:
-            # 记录详细错误以便在 Render 日志中查看
             print(f"Gemini API Error: {str(e)}")
-            # 尝试列出可用模型以进行诊断
+            # 如果 flash 失败，尝试 fallback 到 pro
             try:
-                models = [m.name for m in genai.list_models()]
-                print(f"Available models: {models}")
-            except:
-                pass
-            return jsonify({"reply": f"后端发生异常: {str(e)}"}), 500
+                print("Attempting fallback to gemini-1.5-pro...")
+                model = genai.GenerativeModel('models/gemini-1.5-pro')
+                response = model.generate_content(prompt)
+                return jsonify({"reply": response.text})
+            except Exception as e2:
+                return jsonify({"reply": f"后端发生异常: {str(e2)}"}), 500
     except Exception as e:
         return jsonify({"reply": f"后端发生异常: {str(e)}"}), 500
 
