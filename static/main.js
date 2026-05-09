@@ -113,40 +113,104 @@ function renderJourney(weekNum) {
     if (!curriculumData) return;
     const week = curriculumData.weeks.find(w => w.week === weekNum) || curriculumData.weeks[0];
     
+    // 1. 更新 Hero 区域
     document.getElementById('current-week-tag').innerText = `WEEK ${week.week}`;
     document.getElementById('current-week-topic').innerText = week.topic;
     document.getElementById('current-week-desc').innerText = week.category;
 
-    const taskList = document.getElementById('task-list');
-    taskList.innerHTML = `
-        <div class="task-card current">
-            <div class="task-icon">📍</div>
-            <div class="task-info">
-                <h3>本周探索任务</h3>
-                <p>${week.weekend_task}</p>
-                <div class="mini-progress"><div class="bar" style="width: 40%"></div></div>
-            </div>
-        </div>
-        <div class="task-card" onclick="switchView('studio')">
-            <div class="task-icon">🎙️</div>
-            <div class="task-info">
-                <h3>费曼复盘目标</h3>
-                <p>${week.feynman_goal}</p>
-                <span class="tap-hint">点击进入录音棚 →</span>
-            </div>
-        </div>
-        <div class="task-card">
-            <div class="task-icon">💡</div>
-            <div class="task-info">
-                <h3>思维方法论</h3>
-                <p>${week.methodology}</p>
-            </div>
-        </div>
-    `;
+    // 2. 更新上周回顾
+    const lastWeekReview = document.getElementById('last-week-text');
+    if (weekNum > 1) {
+        const lastWeek = curriculumData.weeks.find(w => w.week === weekNum - 1);
+        lastWeekReview.innerText = `${lastWeek.topic}：${lastWeek.weekend_task}`;
+    } else {
+        document.getElementById('last-week-review').style.display = 'none';
+    }
 
-    // 动态更新 3D 工坊占位符
+    // 3. 更新探索任务详情
+    document.getElementById('task-detail-text').innerText = week.task_detail || week.weekend_task;
+
+    // 4. 动态更新 3D 工坊占位符
     const workshopTopic = document.querySelector('.placeholder-3d p');
     if (workshopTopic) workshopTopic.innerText = `本周课题：${week.topic}`;
+}
+
+// 切换思维表达输入方式
+function switchLogicInput(type) {
+    const voiceArea = document.getElementById('logic-voice-area');
+    const textArea = document.getElementById('logic-text-area');
+    const btns = document.querySelectorAll('.input-toggle .toggle-btn');
+
+    if (type === 'voice') {
+        voiceArea.classList.remove('hidden');
+        textArea.classList.add('hidden');
+        btns[0].classList.add('active');
+        btns[1].classList.remove('active');
+    } else {
+        voiceArea.classList.add('hidden');
+        textArea.classList.remove('hidden');
+        btns[0].classList.remove('active');
+        btns[1].classList.add('active');
+    }
+}
+
+// 保存文字解答
+async function saveLogicText() {
+    const text = document.getElementById('logic-text-input').value.trim();
+    if (!text) return;
+    
+    saveNote(`费曼解题思路 - WEEK ${curriculumData.currentWeek || 8}`, text);
+    
+    // 触发一个简单的 AI 反馈
+    toggleChat();
+    const botMsg = appendMessage('bot', "🔍 正在阅读你的思路...");
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `[费曼解题反馈] 艾米的思路是：${text}。请给她一个简短、充满鼓励的点评，引导她更进一步。` })
+        });
+        const data = await response.json();
+        botMsg.innerText = data.reply;
+    } catch (e) {
+        botMsg.innerText = "思路已存入宝库！艾米真棒！";
+    }
+    document.getElementById('logic-text-input').value = '';
+}
+
+// 点亮灵感
+async function sendInsight() {
+    const insight = document.getElementById('insight-input').value.trim();
+    if (!insight) return;
+
+    const btn = document.querySelector('.send-insight-btn');
+    btn.innerText = "✨ 正在点亮...";
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `[灵感反馈] 艾米在灵感笔记本写下了：${insight}。请作为一个懂教育、有亲和力的助教，给她一个温暖且富有启发性的回应。` })
+        });
+        const data = await response.json();
+        
+        // 弹出对话框展示反馈
+        toggleChat();
+        appendMessage('user', insight);
+        appendMessage('bot', data.reply);
+        
+        saveNote("灵感瞬间", insight);
+        document.getElementById('insight-input').value = '';
+    } catch (e) {
+        alert("连接失败，但灵感已存入笔记。");
+    } finally {
+        btn.innerText = "✨ 点亮灵感";
+    }
+}
+
+function startFeynmanRecording() {
+    // 复用之前的 toggleRecording
+    toggleRecording();
 }
 
 
@@ -360,3 +424,8 @@ window.runTranslation = runTranslation;
 window.runExperiment = runExperiment;
 window.insertLabSnippet = insertLabSnippet;
 window.toggleRecording = toggleRecording;
+window.switchLogicInput = switchLogicInput;
+window.saveLogicText = saveLogicText;
+window.sendInsight = sendInsight;
+window.startFeynmanRecording = startFeynmanRecording;
+window.switchView = switchView;

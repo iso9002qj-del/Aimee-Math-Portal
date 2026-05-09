@@ -67,11 +67,17 @@
             
             <!-- Journey View -->
             <section class="content-view" id="view-journey">
+                <!-- Last Week Review Bar -->
+                <div class="last-week-bar" id="last-week-review">
+                    <span class="bar-label">上周回顾：</span>
+                    <span class="bar-content" id="last-week-text">正在加载上周任务...</span>
+                </div>
+
                 <div class="hero-card">
                     <div class="hero-text">
                         <span class="week-tag" id="current-week-tag">WEEK 8</span>
-                        <h2 id="current-week-topic">一元二次方程深入</h2>
-                        <p id="current-week-desc">本周重点：配方法与求根公式的实战应用</p>
+                        <h2 id="current-week-topic">逻辑推理强化</h2>
+                        <p id="current-week-desc">本周重点：二元逻辑判断与悖论解析</p>
                     </div>
                     <div class="progress-ring">
                         <svg viewBox="0 0 36 36" class="circular-chart">
@@ -82,8 +88,58 @@
                     </div>
                 </div>
 
-                <div class="task-grid" id="task-list">
-                    <!-- Tasks will be injected here -->
+                <div class="interactive-grid">
+                    <!-- Card 1: Detailed Task -->
+                    <div class="card explorer-card">
+                        <div class="card-header">
+                            <span class="card-icon">📍</span>
+                            <h3>本周探索任务</h3>
+                        </div>
+                        <div class="card-body">
+                            <p id="task-detail-text" class="task-detail">正在加载详细任务描述...</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Logic Expression -->
+                    <div class="card logic-card">
+                        <div class="card-header">
+                            <span class="card-icon">🎙️</span>
+                            <h3>思维表达：像大师一样讲解</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-toggle">
+                                <button class="toggle-btn active" onclick="switchLogicInput('voice')">口述解答</button>
+                                <button class="toggle-btn" onclick="switchLogicInput('text')">文字解答</button>
+                            </div>
+                            <div id="logic-voice-area" class="input-area">
+                                <div class="mic-btn" onclick="startFeynmanRecording()">
+                                    <div class="mic-pulse"></div>
+                                    <span>点击录音</span>
+                                </div>
+                            </div>
+                            <div id="logic-text-area" class="input-area hidden">
+                                <textarea id="logic-text-input" placeholder="写下你的推理过程，让逻辑更清晰..."></textarea>
+                                <button class="card-action-btn" onclick="saveLogicText()">保存解答</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Inspiration Notebook -->
+                    <div class="card insight-card">
+                        <div class="card-header">
+                            <span class="card-icon">💡</span>
+                            <h3>艾米的灵感笔记本</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="notebook-area">
+                                <textarea id="insight-input" placeholder="在这里捕捉你的瞬间灵感..."></textarea>
+                                <div class="notebook-footer">
+                                    <span class="hint">AI 实时反馈已开启</span>
+                                    <button class="send-insight-btn" onclick="sendInsight()">✨ 点亮灵感</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
