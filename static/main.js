@@ -271,32 +271,46 @@ function appendMessage(role, text) {
 }
 
 async function runTranslation() {
-    const step1 = document.getElementById('trans-step-1').value;
-    const step2 = document.getElementById('trans-step-2').value;
+    const source = document.getElementById('trans-source').value.trim();
+    const dictionary = document.getElementById('trans-dictionary').value.trim();
+    const model = document.getElementById('trans-model').value.trim();
     const resultArea = document.getElementById('translation-result');
 
-    if (!step1 || !step2) {
-        alert("艾米，请先完成白描和建模两个步骤哦！");
+    if (!source || !dictionary || !model) {
+        alert("艾米，要把题目、词典和模型都填好，翻译机才能全速运转哦！");
         return;
     }
 
     resultArea.classList.remove('hidden');
-    resultArea.innerText = "🔍 正在分析你的翻译逻辑...";
+    resultArea.innerText = "🔍 正在进行多维度逻辑校对...";
 
     try {
         const response = await fetch(`/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                message: `[数学翻译机任务] 题目条件：${step1}。列出的等式：${step2}。请点评我的翻译逻辑，引导我检查是否正确，不要直接给答案。`
+                message: `[数学翻译机 2.0 任务]
+原始题目：${source}
+我的数学词典：${dictionary}
+我的逻辑模型：${model}
+
+请扮演助教小安，从“信息提取”和“逻辑转换”两个维度点评我的翻译。
+如果我漏掉了题目条件或等式列错，请通过提问引导我，不要直接给答案。`
             })
         });
         const data = await response.json();
         resultArea.innerText = data.reply;
         addBadgeProgress('translator');
     } catch (error) {
-        resultArea.innerText = "分析失败，请检查网络。";
+        resultArea.innerText = "翻译机核心连接失败，请检查网络。";
     }
+}
+
+function clearTranslator() {
+    document.getElementById('trans-source').value = '';
+    document.getElementById('trans-dictionary').value = '';
+    document.getElementById('trans-model').value = '';
+    document.getElementById('translation-result').classList.add('hidden');
 }
 
 async function runExperiment() {
@@ -429,3 +443,4 @@ window.saveLogicText = saveLogicText;
 window.sendInsight = sendInsight;
 window.startFeynmanRecording = startFeynmanRecording;
 window.switchView = switchView;
+window.clearTranslator = clearTranslator;

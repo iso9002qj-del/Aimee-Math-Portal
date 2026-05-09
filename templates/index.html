@@ -146,19 +146,42 @@
             <!-- 🔠 数学翻译机 View -->
             <section class="content-view hidden" id="view-translator">
                 <div class="module-intro">
-                    <h2>🔠 数学翻译机</h2>
-                    <p>把文字翻译成代数，让规律浮出水面。</p>
+                    <h2>🔠 数学翻译机 2.0</h2>
+                    <p>剥离文字迷雾，建立数学词典，构建逻辑模型。</p>
                 </div>
-                <div class="translator-ui">
-                    <div class="step-card">
-                        <label>1. 白描翻译：识别题目条件</label>
-                        <input type="text" id="trans-step-1" placeholder="例如：设未知数为 x...">
+                <div class="translator-ui-v2">
+                    <div class="step-card-v2">
+                        <div class="step-header">
+                            <span class="step-num">01</span>
+                            <label>原始题目：把让你困惑的文字贴在这里</label>
+                        </div>
+                        <textarea id="trans-source" placeholder="例如：一艘船顺流航行 3 小时行了 60 千米..."></textarea>
                     </div>
-                    <div class="step-card">
-                        <label>2. 逻辑建模：列出等式</label>
-                        <input type="text" id="trans-step-2" placeholder="例如：2x + 10 = 50">
+
+                    <div class="step-card-v2">
+                        <div class="step-header">
+                            <span class="step-num">02</span>
+                            <label>建立词典：提取变量与常量</label>
+                        </div>
+                        <textarea id="trans-dictionary" placeholder="例如：
+x = 水流速度
+v = 船速
+路程 = 60"></textarea>
                     </div>
-                    <button class="tool-btn primary-btn" onclick="runTranslation()">🔍 提交翻译分析</button>
+
+                    <div class="step-card-v2">
+                        <div class="step-header">
+                            <span class="step-num">03</span>
+                            <label>对位建模：构建数学等量关系</label>
+                        </div>
+                        <textarea id="trans-model" placeholder="例如：3 * (v + x) = 60"></textarea>
+                    </div>
+
+                    <div class="translator-actions">
+                        <button class="tool-btn primary-btn" onclick="runTranslation()">🔍 启动逻辑校对</button>
+                        <button class="tool-btn secondary-btn" onclick="clearTranslator()">🧹 清空画布</button>
+                    </div>
+                    
                     <div id="translation-result" class="result-area hidden"></div>
                 </div>
             </section>
