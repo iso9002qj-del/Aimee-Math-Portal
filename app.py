@@ -79,7 +79,7 @@ def chat():
 
         prompt = f"""
         你是数学助教小安，辅导12岁女孩艾米。
-        请根据课程内容【{current_task}】进行互动。
+        请根据课程内容【{week_data.get('topic', '数学逻辑')}】进行互动。
         保持亲切、严谨、多提问引导。
         
         艾米说：{user_message}
