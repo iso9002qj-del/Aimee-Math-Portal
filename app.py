@@ -68,14 +68,17 @@ def chat():
         if not api_key:
             return jsonify({"reply": "错误：云端 API Key 未配置。请设置 GEMINI_API_KEY。"}), 500
 
+        # 强制配置
         genai.configure(api_key=api_key)
         
-        # 调试：列出可用模型
+        # 深度诊断：列出可用模型到控制台
+        print("--- BEGIN GEMINI DIAGNOSTICS ---")
         try:
             available_models = [m.name for m in genai.list_models()]
-            print(f"Render Environment Available Models: {available_models}")
-        except Exception as list_err:
-            print(f"Failed to list models: {str(list_err)}")
+            print(f"AVAILABLE MODELS: {available_models}")
+        except Exception as e:
+            print(f"DIAGNOSTIC ERROR: {str(e)}")
+        print("--- END GEMINI DIAGNOSTICS ---")
 
         prompt = f"""
         你是数学助教小安，辅导12岁女孩艾米。
@@ -86,20 +89,26 @@ def chat():
         """
 
         try:
-            # 使用显式命名空间
-            model = genai.GenerativeModel('models/gemini-1.5-flash')
+            # 尝试使用最通用的名称，不带 models/ 前缀
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             return jsonify({"reply": response.text})
         except Exception as e:
-            print(f"Gemini API Error: {str(e)}")
-            # 如果 flash 失败，尝试 fallback 到 pro
+            print(f"Gemini API Error (Flash): {str(e)}")
             try:
-                print("Attempting fallback to gemini-1.5-pro...")
-                model = genai.GenerativeModel('models/gemini-1.5-pro')
+                # 尝试带前缀
+                model = genai.GenerativeModel('models/gemini-1.5-flash')
                 response = model.generate_content(prompt)
                 return jsonify({"reply": response.text})
             except Exception as e2:
-                return jsonify({"reply": f"后端发生异常: {str(e2)}"}), 500
+                print(f"Gemini API Error (Flash-models/): {str(e2)}")
+                try:
+                    # 尝试 Pro
+                    model = genai.GenerativeModel('gemini-1.5-pro')
+                    response = model.generate_content(prompt)
+                    return jsonify({"reply": response.text})
+                except Exception as e3:
+                    return jsonify({"reply": f"后端异常汇总: {str(e3)}. 环境支持模型: {str(available_models if 'available_models' in locals() else 'Unknown')}"}), 500
     except Exception as e:
         return jsonify({"reply": f"后端发生异常: {str(e)}"}), 500
 
