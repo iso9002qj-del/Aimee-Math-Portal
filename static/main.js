@@ -13,6 +13,45 @@ async function initApp() {
     initNav();
     updateVault();
     initWorkshop();
+    renderLabCases(); // 初始化实验室案例库
+}
+
+const labCases = [
+    { title: "三角形的叛逆", desc: "三条边分别是 1, 2, 100，能拼成三角形吗？", setup: "【实验假设】我有一根 100cm 的长木棒，和两根分别是 1cm、2cm 的短木棒。我想把它们搭成一个三角形..." },
+    { title: "倒霉鬼的抽屉", desc: "10黑袜10白袜，最少拿几只保证有一双？", setup: "【实验假设】假设我是世界上最倒霉的人，我每次伸手进漆黑的屋子抓袜子，抓出来的总是..." },
+    { title: "消失的 1 元钱", desc: "经典的 29 元与 30 元逻辑陷阱。", setup: "【实验假设】三人住店每人出 10 元共 30 元。老板退 5 元，伙计藏 2 元，每人分回 1 元。现在每人实际出 9 元，3*9=27，加上伙计的 2 元是 29 元。那 1 元去哪了？" },
+    { title: "除以 0 的爆炸", desc: "当分母无限接近 0，结果会怎样？", setup: "【实验假设】10 / 1 = 10; 10 / 0.1 = 100; 10 / 0.0001 = 100,000... 如果我直接除以 0，结果是无限大还是不存在？" },
+    { title: "诚实村的悖论", desc: "只问一个问题，通过逻辑陷阱找到路。", setup: "【实验假设】我对路口的村民说：‘如果你是另一个村的人，你会指哪条路是去诚实村的？’ 无论他是谁，他指出的路一定是..." },
+    { title: "折纸超月球", desc: "指数增长的直觉挑战。", setup: "【实验假设】一张纸厚 0.1 毫米，折叠 1 次变 0.2，2 次变 0.4... 如果我折叠 42 次，它的厚度能超过 38 万千米（地月距离）吗？" },
+    { title: "周长相等谁最大", desc: "探索周长与面积的形状奥秘。", setup: "【实验假设】我有 20 厘米长的绳子。我把它围成：长方形（长 9 宽 1）、正方形、圆。它们的面积分别是..." },
+    { title: "追不上的乌龟", desc: "芝诺悖论：无限分割的时间与距离。", setup: "【实验假设】我追赶前方 10 米的乌龟，我的速度是它的 10 倍。当我追到它起点的 10 米时，它又前进了 1 米；当我再追 1 米，它又前进了 0.1 米..." },
+    { title: "膨胀的立方体", desc: "体积与边长的几何级关系。", setup: "【实验假设】一个正方体魔方。如果我把它的每一条边长都翻一倍，那它的体积（小方块的数量）会变成原来的几倍？" },
+    { title: "大数定律的错觉", desc: "连续 10 次正面，下一次的概率？", setup: "【实验假设】我扔了 10 次硬币，竟然全部是正面！那第 11 次，反面出现的概率会因为‘亏欠太多’而变大吗？" }
+];
+
+function renderLabCases() {
+    const list = document.getElementById('lab-case-list');
+    if (!list) return;
+    list.innerHTML = labCases.map((c, i) => `
+        <div class="case-item" onclick="loadLabCase(${i})">
+            <div class="case-title">${c.title}</div>
+            <div class="case-desc">${c.desc}</div>
+        </div>
+    `).join('');
+}
+
+async function loadLabCase(index) {
+    const c = labCases[index];
+    const scratch = document.getElementById('lab-scratch');
+    scratch.innerText = c.setup;
+    scratch.focus();
+    
+    // 自动切换到实验室视图
+    switchView('lab');
+    
+    // 触发 AI 的第一句引导
+    toggleChat();
+    appendMessage('bot', `🔍 艾米，你选择了案例【${c.title}】。这个实验非常有趣，试着在左侧写下你的推导，或者点击下方的试错工具来压测这个逻辑！`);
 }
 
 function initWorkshop() {
@@ -444,3 +483,4 @@ window.sendInsight = sendInsight;
 window.startFeynmanRecording = startFeynmanRecording;
 window.switchView = switchView;
 window.clearTranslator = clearTranslator;
+window.loadLabCase = loadLabCase;

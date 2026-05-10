@@ -421,41 +421,84 @@ body {
     color: var(--text-dim);
 }
 
-/* Lab & Translator Shared */
-.translator-ui, .lab-ui, .workshop-ui, .studio-ui {
+/* --- Lab Workspace 2.0 --- */
+.lab-workspace {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.lab-main-panel {
+    flex: 3;
+}
+
+.lab-inspiration-library {
+    flex: 2;
     background: var(--card-bg);
-    padding: 30px;
     border-radius: 20px;
     border: 1px solid var(--glass-border);
+    padding: 24px;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
 }
 
-.step-card {
-    margin-bottom: 24px;
+.library-header {
+    margin-bottom: 20px;
 }
 
-.step-card label {
-    display: block;
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: var(--accent-primary);
+.library-header h3 {
+    color: var(--accent-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 4px;
 }
 
-.step-card input {
-    width: 100%;
-    background: var(--bg-color);
+.library-header span {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.case-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.case-item {
+    background: oklch(1 0 0 / 0.03);
     border: 1px solid var(--glass-border);
     padding: 16px;
     border-radius: 12px;
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid var(--accent-primary);
 }
 
-/* Lab Panel */
+.case-item:hover {
+    background: oklch(1 0 0 / 0.08);
+    transform: translateX(5px);
+    border-color: var(--accent-primary);
+}
+
+.case-item .case-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.case-item .case-desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
 .experiment-panel {
-    background: var(--bg-color);
+    background: var(--card-bg);
     border-radius: 16px;
-    padding: 20px;
+    padding: 24px;
+    border: 1px solid var(--glass-border);
 }
 
 .panel-header {
@@ -464,6 +507,7 @@ body {
     margin-bottom: 15px;
     border-bottom: 1px solid var(--glass-border);
     padding-bottom: 10px;
+    font-weight: 700;
 }
 
 .scratch-pad {

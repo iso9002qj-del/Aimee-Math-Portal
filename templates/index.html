@@ -190,22 +190,37 @@ v = 船速
             <section class="content-view hidden" id="view-lab">
                 <div class="module-intro">
                     <h2>🔬 试错与反证实验室</h2>
-                    <p>“错误是通向真理的必经之路。”在这里代入极端情况试错吧！</p>
+                    <p>“错误是通向真理的必经之路。”在这里代入极端情况，验证你的猜想。</p>
                 </div>
-                <div class="lab-ui">
-                    <div class="experiment-panel">
-                        <div class="panel-header">探索记录：极端情况推理</div>
-                        <div class="scratch-pad" id="lab-scratch" contenteditable="true" placeholder="在这里写下你的试错路径...">
-                            假设我遇到了最倒霉的情况...
+                
+                <div class="lab-workspace">
+                    <!-- Left Side: Action Area -->
+                    <div class="lab-main-panel">
+                        <div class="experiment-panel">
+                            <div class="panel-header">🧪 实验控制台：输入你的试错路径</div>
+                            <div class="scratch-pad" id="lab-scratch" contenteditable="true" placeholder="在这里写下你的试错假设，或者从右侧选择一个案例开始...">
+                                假设我遇到了最倒霉的情况...
+                            </div>
+                            <div class="lab-tools">
+                                <button class="tool-btn" onclick="insertLabSnippet('0 或 1')">代入 0 或 1</button>
+                                <button class="tool-btn" onclick="insertLabSnippet('极大值')">代入极大值</button>
+                                <button class="tool-btn" onclick="insertLabSnippet('反证法')">反证法推导</button>
+                            </div>
                         </div>
-                        <div class="lab-tools">
-                            <button class="tool-btn" onclick="insertLabSnippet('0 或 1')">代入 0 或 1</button>
-                            <button class="tool-btn" onclick="insertLabSnippet('极大值')">代入极大值</button>
-                            <button class="tool-btn" onclick="insertLabSnippet('反证法')">反证法推导</button>
-                        </div>
+                        <button class="tool-btn primary-btn" style="margin-top: 20px; width: 100%;" onclick="runExperiment()">🚀 启动试错逻辑验证</button>
+                        <div id="lab-result" class="result-area hidden"></div>
                     </div>
-                    <button class="tool-btn primary-btn" style="margin-top: 20px;" onclick="runExperiment()">🧪 启动试错分析</button>
-                    <div id="lab-result" class="result-area hidden"></div>
+
+                    <!-- Right Side: Inspiration Library -->
+                    <aside class="lab-inspiration-library">
+                        <div class="library-header">
+                            <h3>💡 灵感案例库</h3>
+                            <span>(点击案例开启实验)</span>
+                        </div>
+                        <div class="case-list" id="lab-case-list">
+                            <!-- Cases will be injected here by JS -->
+                        </div>
+                    </aside>
                 </div>
             </section>
 
