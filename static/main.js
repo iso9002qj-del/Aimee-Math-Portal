@@ -16,7 +16,8 @@ async function initApp() {
     renderLabCases(); // 初始化实验室案例库
 }
 
-const labCases = [
+// 脑洞案例池 (20+ 案例)
+const labCasePool = [
     { title: "三角形的叛逆", desc: "三条边分别是 1, 2, 100，能拼成三角形吗？", setup: "【实验假设】我有一根 100cm 的长木棒，和两根分别是 1cm、2cm 的短木棒。我想把它们搭成一个三角形..." },
     { title: "倒霉鬼的抽屉", desc: "10黑袜10白袜，最少拿几只保证有一双？", setup: "【实验假设】假设我是世界上最倒霉的人，我每次伸手进漆黑的屋子抓袜子，抓出来的总是..." },
     { title: "消失的 1 元钱", desc: "经典的 29 元与 30 元逻辑陷阱。", setup: "【实验假设】三人住店每人出 10 元共 30 元。老板退 5 元，伙计藏 2 元，每人分回 1 元。现在每人实际出 9 元，3*9=27，加上伙计的 2 元是 29 元。那 1 元去哪了？" },
@@ -26,32 +27,70 @@ const labCases = [
     { title: "周长相等谁最大", desc: "探索周长与面积的形状奥秘。", setup: "【实验假设】我有 20 厘米长的绳子。我把它围成：长方形（长 9 宽 1）、正方形、圆。它们的面积分别是..." },
     { title: "追不上的乌龟", desc: "芝诺悖论：无限分割的时间与距离。", setup: "【实验假设】我追赶前方 10 米的乌龟，我的速度是它的 10 倍。当我追到它起点的 10 米时，它又前进了 1 米；当我再追 1 米，它又前进了 0.1 米..." },
     { title: "膨胀的立方体", desc: "体积与边长的几何级关系。", setup: "【实验假设】一个正方体魔方。如果我把它的每一条边长都翻一倍，那它的体积（小方块的数量）会变成原来的几倍？" },
-    { title: "大数定律的错觉", desc: "连续 10 次正面，下一次的概率？", setup: "【实验假设】我扔了 10 次硬币，竟然全部是正面！那第 11 次，反面出现的概率会因为‘亏欠太多’而变大吗？" }
+    { title: "大数定律的错觉", desc: "连续 10 次正面，下一次的概率？", setup: "【实验假设】我扔了 10 次硬币，竟然全部是正面！那第 11 次，反面出现的概率会因为‘亏欠太多’而变大吗？" },
+    { title: "消失的面积", desc: "剪纸拼图里的神秘失踪案。", setup: "【实验假设】我把一个 8x8 的正方形剪成四个部分重新拼接，结果竟然变成了一个 5x13 的长方形（面积 65）！那多出来的 1 哪里去了？" },
+    { title: "分饼干的公平", desc: "博弈论初探：我切你选。", setup: "【实验假设】我和哥哥分最后一块饼干，谁都想拿大的。如果我来切，但他先选，我该怎么切才能最公平？" },
+    { title: "最快的路径", desc: "最速降线：直线真的是最快吗？", setup: "【实验假设】有两点 A 和 B。我有三条滑梯：直的、弯的、深弯的。球从哪条滑下用时最短？" },
+    { title: "城市的地图", desc: "四色定理：染色专家的极限挑战。", setup: "【实验假设】我要给一张非常复杂的地图染色，要求相邻的区域颜色不能相同。我最少需要准备几种颜色？" },
+    { title: "消失的 1% 盐水", desc: "百分比的浓度陷阱。", setup: "【实验假设】100克含盐 99% 的盐水，蒸发掉一部分水后含盐量变 98%。现在的重量是 50 克还是 99 克？" }
 ];
+
+let activeCaseIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+let usedCaseIndices = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 function renderLabCases() {
     const list = document.getElementById('lab-case-list');
     if (!list) return;
-    list.innerHTML = labCases.map((c, i) => `
-        <div class="case-item" onclick="loadLabCase(${i})">
-            <div class="case-title">${c.title}</div>
-            <div class="case-desc">${c.desc}</div>
-        </div>
-    `).join('');
+    list.innerHTML = activeCaseIndices.map((idx, slotIdx) => {
+        const c = labCasePool[idx];
+        return `
+            <div class="case-item animate-in" onclick="loadLabCase(${slotIdx})">
+                <div class="case-title">${c.title}</div>
+                <div class="case-desc">${c.desc}</div>
+            </div>
+        `;
+    }).join('');
 }
 
-async function loadLabCase(index) {
-    const c = labCases[index];
+async function loadLabCase(slotIdx) {
+    const caseIdx = activeCaseIndices[slotIdx];
+    const c = labCasePool[caseIdx];
+    
+    // 1. 设置实验台
     const scratch = document.getElementById('lab-scratch');
     scratch.innerText = c.setup;
     scratch.focus();
     
-    // 自动切换到实验室视图
-    switchView('lab');
+    // 2. 动态替换：寻找一个没用过的案例补位
+    let nextIdx = -1;
+    for (let i = 0; i < labCasePool.length; i++) {
+        if (!usedCaseIndices.has(i)) {
+            nextIdx = i;
+            break;
+        }
+    }
     
-    // 触发 AI 的第一句引导
+    // 如果全部用过了，重置已用池（循环往复）
+    if (nextIdx === -1) {
+        usedCaseIndices.clear();
+        activeCaseIndices.forEach(idx => usedCaseIndices.add(idx));
+        for (let i = 0; i < labCasePool.length; i++) {
+            if (!usedCaseIndices.has(i)) {
+                nextIdx = i;
+                break;
+            }
+        }
+    }
+
+    if (nextIdx !== -1) {
+        activeCaseIndices[slotIdx] = nextIdx;
+        usedCaseIndices.add(nextIdx);
+        renderLabCases();
+    }
+    
+    // 3. 触发 AI
     toggleChat();
-    appendMessage('bot', `🔍 艾米，你选择了案例【${c.title}】。这个实验非常有趣，试着在左侧写下你的推导，或者点击下方的试错工具来压测这个逻辑！`);
+    appendMessage('bot', `🔍 艾米，案例【${c.title}】已加载。这是一个经典的逻辑挑战。写下你的推导，或者点击左侧工具进行压测！`);
 }
 
 function initWorkshop() {

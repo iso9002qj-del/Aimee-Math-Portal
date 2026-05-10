@@ -824,3 +824,12 @@ body {
     background: oklch(1 0 0 / 0.05) !important;
     color: var(--text-main) !important;
 }
+
+.animate-in {
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
