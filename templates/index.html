@@ -227,19 +227,65 @@ v = 船速
             <!-- 🛠️ 重新发明工坊 View -->
             <section class="content-view hidden" id="view-workshop">
                 <div class="module-intro">
-                    <h2>🛠️ 重新发明工坊</h2>
-                    <p>不要背公式，去“发明”它。利用教具观察规律。</p>
+                    <h2>🛠️ 重新发明工坊 2.0</h2>
+                    <p>不要背公式，去“发明”它。利用精密教具观察规律。</p>
                 </div>
-                <div class="workshop-ui">
-                    <div class="canvas-area">
-                        <div class="placeholder-3d">
-                            <span>📐 3D 几何教具加载中...</span>
-                            <p>本周课题：圆柱体积公式的推导</p>
+                
+                <div class="workshop-layout">
+                    <!-- Mission Sidebar -->
+                    <aside class="workshop-missions">
+                        <div class="mission-header">📖 发明任务书</div>
+                        <div class="mission-list" id="workshop-mission-list">
+                            <!-- Mission Cards -->
+                            <div class="mission-card active" onclick="loadMission(0)">
+                                <span class="m-icon">🎯</span>
+                                <div class="m-info">
+                                    <div class="m-title">圆的面积</div>
+                                    <div class="m-status">进行中</div>
+                                </div>
+                            </div>
+                            <div class="mission-card" onclick="loadMission(1)">
+                                <span class="m-icon">🔋</span>
+                                <div class="m-info">
+                                    <div class="m-title">圆柱的体积</div>
+                                    <div class="m-status">待开启</div>
+                                </div>
+                            </div>
+                            <div class="mission-card" onclick="loadMission(2)">
+                                <span class="m-icon">🍦</span>
+                                <div class="m-info">
+                                    <div class="m-title">圆锥的体积</div>
+                                    <div class="m-status">待开启</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="discovery-log">
-                        <h3>我的发现：</h3>
-                        <textarea placeholder="用你自己的语言总结这个规律..."></textarea>
+                    </aside>
+
+                    <!-- Main Action Area -->
+                    <div class="workshop-main">
+                        <div class="canvas-panel">
+                            <div class="canvas-header">
+                                <h3 id="canvas-task-name">任务：圆的面积推导</h3>
+                                <div class="canvas-tools">
+                                    <span class="tool-label">细分数：</span>
+                                    <input type="range" id="split-slider" min="4" max="64" step="4" value="8" oninput="updateWorkshopSim()">
+                                    <span id="split-value">8 份</span>
+                                </div>
+                            </div>
+                            <!-- Interactive SVG Container -->
+                            <div class="interactive-canvas" id="workshop-canvas">
+                                <!-- Interactive Elements Injected by JS -->
+                            </div>
+                            <div class="canvas-footer">
+                                <span>滑动滑条：观察切割与拼合的过程</span>
+                            </div>
+                        </div>
+
+                        <div class="discovery-log-v2">
+                            <div class="log-header">🖋️ 我的发明日志</div>
+                            <textarea id="workshop-log" placeholder="在这个教具中，你发现了什么规律？试着推导那个公式..."></textarea>
+                            <button class="tool-btn primary-btn" onclick="submitDiscovery()">✨ 提交我的发现</button>
+                        </div>
                     </div>
                 </div>
             </section>

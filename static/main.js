@@ -93,24 +93,114 @@ async function loadLabCase(slotIdx) {
     appendMessage('bot', `🔍 艾米，案例【${c.title}】已加载。这是一个经典的逻辑挑战。写下你的推导，或者点击左侧工具进行压测！`);
 }
 
+let currentMissionIdx = 0;
+const workshopMissions = [
+    { name: "圆的面积", icon: "🎯", prompt: "试着观察：当圆被无限切分并重新拼合后，它变成了什么形状？长和宽与圆的半径、周长有什么关系？" },
+    { name: "圆柱的体积", icon: "🔋", prompt: "如果把圆柱切成等分的扇形柱并拼接，它会变成什么？" },
+    { name: "圆锥的体积", icon: "🍦", prompt: "三个圆锥的沙子，能填满一个等底等高的圆柱吗？" }
+];
+
 function initWorkshop() {
-    const canvas = document.querySelector('.canvas-area');
-    // 添加一个简单的互动 SVG
-    canvas.innerHTML = `
-        <svg viewBox="0 0 200 200" style="width: 100%; height: 100%;">
-            <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:var(--accent-primary);stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:var(--accent-secondary);stop-opacity:1" />
-                </linearGradient>
-            </defs>
-            <circle cx="100" cy="100" r="80" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-dasharray="5,5">
-                <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite" />
-            </circle>
-            <text x="100" y="105" text-anchor="middle" fill="var(--accent-primary)" font-size="10" font-weight="bold">思维实验室活跃中</text>
-            <path d="M60,100 L140,100 M100,60 L100,140" stroke="var(--glass-border)" stroke-width="1" />
-        </svg>
-    `;
+    loadMission(0);
+}
+
+function loadMission(idx) {
+    currentMissionIdx = idx;
+    const mission = workshopMissions[idx];
+    
+    // 更新 UI 状态
+    document.getElementById('canvas-task-name').innerText = `任务：${mission.name}推导`;
+    document.getElementById('workshop-log').placeholder = mission.prompt;
+    
+    document.querySelectorAll('.mission-card').forEach((card, i) => {
+        card.classList.toggle('active', i === idx);
+    });
+
+    // 渲染对应的模拟器
+    if (idx === 0) {
+        renderCircleSim();
+    } else {
+        document.getElementById('workshop-canvas').innerHTML = `<div style="color:var(--text-dim)">${mission.name} 教具正在精密打磨中...</div>`;
+    }
+}
+
+function renderCircleSim() {
+    updateWorkshopSim();
+}
+
+function updateWorkshopSim() {
+    const segments = parseInt(document.getElementById('split-slider').value);
+    document.getElementById('split-value').innerText = `${segments} 份`;
+    
+    const canvas = document.getElementById('workshop-canvas');
+    const size = 300;
+    const r = 80;
+    const cx = size / 2;
+    const cy = size / 2;
+    
+    let svgHtml = `<svg viewBox="0 0 ${size} ${size}" style="width:100%; height:100%">`;
+    
+    // 计算每个扇形的弧度
+    const angleStep = (Math.PI * 2) / segments;
+    
+    for (let i = 0; i < segments; i++) {
+        const startAngle = i * angleStep;
+        const endAngle = (i + 1) * angleStep;
+        
+        // 简单的平铺逻辑：我们将扇形交错排列
+        // 奇数项向上，偶数项向下
+        const isOdd = i % 2 === 0;
+        const offsetX = (i - segments/2) * (r * 2 / segments) * 1.5 + cx;
+        const offsetY = isOdd ? cy - 20 : cy + 20;
+        
+        // 扇形路径
+        const x1 = cx + r * Math.cos(startAngle);
+        const y1 = cy + r * Math.sin(startAngle);
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        
+        // 我们通过动画展示从圆到长方形的过渡
+        // 这里简化处理：直接根据细分数展示拼合状态
+        svgHtml += `
+            <path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" 
+                  fill="${isOdd ? 'var(--accent-primary)' : 'var(--accent-secondary)'}" 
+                  fill-opacity="0.6"
+                  stroke="var(--bg-color)"
+                  stroke-width="0.5">
+                  <animate attributeName="d" dur="0.5s" fill="freeze" />
+            </path>
+        `;
+    }
+    
+    svgHtml += `
+        <text x="50%" y="20%" text-anchor="middle" fill="var(--text-dim)" font-size="12">
+            正在探索：圆 -> 近似长方形的转化
+        </text>
+    </svg>`;
+    
+    canvas.innerHTML = svgHtml;
+}
+
+async function submitDiscovery() {
+    const log = document.getElementById('workshop-log').value.trim();
+    if (!log) return;
+    
+    saveNote(`发明日志 - ${workshopMissions[currentMissionIdx].name}`, log);
+    
+    toggleChat();
+    const botMsg = appendMessage('bot', "🔍 正在审阅你的发明报告...");
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `[重新发明反馈] 艾米正在研究${workshopMissions[currentMissionIdx].name}，她的发现是：${log}。请像导师一样点评她的推导逻辑。` })
+        });
+        const data = await response.json();
+        botMsg.innerText = data.reply;
+    } catch (e) {
+        botMsg.innerText = "报告已同步到你的魔法宝库！继续保持这份好奇心！";
+    }
+    document.getElementById('workshop-log').value = '';
 }
 
 async function loadData() {
@@ -523,3 +613,6 @@ window.startFeynmanRecording = startFeynmanRecording;
 window.switchView = switchView;
 window.clearTranslator = clearTranslator;
 window.loadLabCase = loadLabCase;
+window.loadMission = loadMission;
+window.updateWorkshopSim = updateWorkshopSim;
+window.submitDiscovery = submitDiscovery;
