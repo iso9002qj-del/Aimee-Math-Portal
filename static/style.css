@@ -618,23 +618,40 @@ body {
 
 .tool-label { font-size: 0.85rem; color: var(--text-dim); }
 
-.interactive-canvas {
-    height: 400px;
-    background: radial-gradient(circle at center, oklch(0.2 0.02 250), var(--bg-color));
+.interactive-canvas-v2 {
+    height: 500px; /* 增加高度以适应 GeoGebra 复杂的 UI */
+    background: #f8f9fa;
     border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
 }
 
-.canvas-footer {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 0.85rem;
-    color: var(--accent-secondary);
-    opacity: 0.8;
+.canvas-loader {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--glass-border);
+    border-top: 4px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .discovery-log-v2 {

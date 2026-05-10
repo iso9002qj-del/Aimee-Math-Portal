@@ -95,9 +95,24 @@ async function loadLabCase(slotIdx) {
 
 let currentMissionIdx = 0;
 const workshopMissions = [
-    { name: "圆的面积", icon: "🎯", prompt: "试着观察：当圆被无限切分并重新拼合后，它变成了什么形状？长和宽与圆的半径、周长有什么关系？" },
-    { name: "圆柱的体积", icon: "🔋", prompt: "如果把圆柱切成等分的扇形柱并拼接，它会变成什么？" },
-    { name: "圆锥的体积", icon: "🍦", prompt: "三个圆锥的沙子，能填满一个等底等高的圆柱吗？" }
+    { 
+        name: "圆的面积", 
+        icon: "🎯", 
+        url: "https://www.geogebra.org/material/iframe/id/msS6pZ3p?embed=true",
+        prompt: "观察：圆被切分并重新拼合后，它的底和高分别对应圆的什么部分？" 
+    },
+    { 
+        name: "圆柱的体积", 
+        icon: "🔋", 
+        url: "https://www.geogebra.org/material/iframe/id/Xm3r4wM9?embed=true",
+        prompt: "在 3D 视角下，圆柱是如何通过切分变成长方体的？" 
+    },
+    { 
+        name: "圆锥的体积", 
+        icon: "🍦", 
+        url: "https://www.geogebra.org/material/iframe/id/z7K7Mh6v?embed=true",
+        prompt: "仔细看，三个圆锥的液体倒入圆柱后，刚好发生了什么？" 
+    }
 ];
 
 function initWorkshop() {
@@ -116,12 +131,16 @@ function loadMission(idx) {
         card.classList.toggle('active', i === idx);
     });
 
-    // 渲染对应的模拟器
-    if (idx === 0) {
-        renderCircleSim();
-    } else {
-        document.getElementById('workshop-canvas').innerHTML = `<div style="color:var(--text-dim)">${mission.name} 教具正在精密打磨中...</div>`;
-    }
+    // 加载 GeoGebra
+    const frame = document.getElementById('geogebra-frame');
+    const loader = document.getElementById('canvas-loader');
+    
+    loader.classList.remove('hidden');
+    frame.src = mission.url;
+    
+    frame.onload = () => {
+        loader.classList.add('hidden');
+    };
 }
 
 function renderCircleSim() {

@@ -272,9 +272,18 @@ v = 船速
                                     <span id="split-value">8 份</span>
                                 </div>
                             </div>
-                            <!-- Interactive SVG Container -->
-                            <div class="interactive-canvas" id="workshop-canvas">
-                                <!-- Interactive Elements Injected by JS -->
+                            <!-- GeoGebra Embed Container -->
+                            <div class="interactive-canvas-v2" id="workshop-canvas-container">
+                                <iframe id="geogebra-frame" 
+                                        src="" 
+                                        width="100%" 
+                                        height="100%" 
+                                        style="border:none; border-radius:16px;">
+                                </iframe>
+                                <div id="canvas-loader" class="canvas-loader hidden">
+                                    <div class="spinner"></div>
+                                    <span>正在连接全球数学引擎...</span>
+                                </div>
                             </div>
                             <div class="canvas-footer">
                                 <span>滑动滑条：观察切割与拼合的过程</span>
